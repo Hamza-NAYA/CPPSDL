@@ -12,6 +12,7 @@ Grid::Grid() : grid(4, std::vector<Tile>(4)) {
 }
 
 void Grid::display() {
+    system("cls");
     for (const auto& row : grid) {
         for (const auto& tile : row) {
             std::cout << tile.getValue() << "\t";
@@ -26,16 +27,20 @@ bool Grid::canMerge(Tile a, Tile b) {
 
 bool Grid::slide(std::vector<Tile>& row) {
     bool moved = false;
+    std::vector<bool> merged(row.size(), false);
+
     for (size_t i = 0; i < row.size(); ++i) {
         for (size_t j = i + 1; j < row.size(); ++j) {
             if (row[j].isEmpty()) continue;
+
             if (row[i].isEmpty()) {
                 row[i].setValue(row[j].getValue());
                 row[j].setValue(0);
                 moved = true;
-            } else if (canMerge(row[i], row[j])) {
+            } else if (canMerge(row[i], row[j]) && !merged[i]) {
                 row[i].setValue(row[i].getValue() * 2);
                 row[j].setValue(0);
+                merged[i] = true;
                 moved = true;
             }
             break;
@@ -43,6 +48,7 @@ bool Grid::slide(std::vector<Tile>& row) {
     }
     return moved;
 }
+
 
 bool Grid::moveLeft() {
     bool moved = false;
@@ -95,7 +101,7 @@ bool Grid::moveDown() {
             moved = true;
         }
         std::reverse(column.begin(), column.end());
-        for (int row = 0; row < 2; ++row) {
+        for (int row = 0; row < 4; ++row) {
             grid[row][col] = column[row];
         }
     }
@@ -114,8 +120,8 @@ bool Grid::addRandomTile() {
     if (emptyTiles.empty()) return false;
 
     int x, y;
-    std::tie(x, y) = emptyTiles[rand() % emptyTiles.size()];  // Récupère x et y depuis emptyTiles
-    grid[x][y].setValue((rand() % 2 + 1) * 2);  // Utilisation correcte de x et y
+    std::tie(x, y) = emptyTiles[rand() % emptyTiles.size()];
+    grid[x][y].setValue((rand() % 2 + 1) * 2);
     return true;
 }
 
